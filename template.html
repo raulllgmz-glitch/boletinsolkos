@@ -226,6 +226,20 @@
 
   .empty-state{border:1px dashed var(--line);border-radius:14px;padding:16px 20px;color:var(--ink-dim);font-size:12.5px;background:rgba(255,255,255,0.02);}
 
+  .older-toggle{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    margin:8px 0 4px 0;padding:11px;border-radius:12px;
+    background:var(--card);border:1px dashed var(--line);
+    color:var(--ink-soft);font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .older-toggle:hover{color:var(--text-strong);border-color:var(--coral);}
+  .older-toggle .ot-chev{transition:transform .2s ease;}
+  .older-toggle.open .ot-chev{transform:rotate(180deg);}
+  .older-feed{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+  .older-feed.open{max-height:640px;overflow-y:auto;margin-top:10px;padding-right:4px;}
+  .older-feed::-webkit-scrollbar{width:6px;}
+  .older-feed::-webkit-scrollbar-thumb{background:var(--polar);border-radius:10px;}
+
   .contactbox{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:12px;display:flex;flex-direction:column;gap:6px;}
   .cb-row{display:flex;gap:10px;font-size:12px;}
   .cb-lbl{width:74px;flex:none;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;padding-top:1px;}
@@ -238,6 +252,11 @@
   .sharebtn.wa{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);}
   .sharebtn.mail{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);}
   .sharebtn.disabled{background:transparent;color:var(--ink-dim);border:1px dashed var(--line);cursor:default;}
+  .sharebtn.evidencia{background:var(--card);color:var(--amber);border:1px solid rgba(245,166,35,0.35);}
+
+  .sinergia-estab{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text-strong);margin-bottom:3px;}
+  .dias-sin-atender{margin-top:10px;padding:9px 14px;background:rgba(255,107,107,0.10);border:1px solid rgba(255,107,107,0.25);border-radius:10px;font-size:13px;font-weight:600;color:var(--danger);display:inline-block;}
+  .dias-sin-atender.urgente{background:rgba(255,107,107,0.18);border-color:rgba(255,107,107,0.45);}
 
   .sharefallback{display:none;margin-top:10px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:10px;}
   .sharefallback .sf-lbl{font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
@@ -356,8 +375,8 @@
   <p style="font-size:12px;color:var(--ink-dim);margin-top:14px;">El caso de El Granjero del Ahorro (arriba, en servicios) también aparece aquí — la falta de acceso es el mismo tipo de bloqueo.</p>
 
   <footer>
-    Generado automáticamente desde Consola Solkos · Módulo de Servicios — Cliente Alpura · Datos desde julio 2026<br>
-    Mockup de diseño — la cadencia de envío (correo / WhatsApp) se define en un paso posterior.
+    Generados desde Consola Solkos Powered by Imbera<br>
+    Módulo de Servicios — Cliente Alpura · Datos desde julio 2026
   </footer>
 </div>
 
@@ -408,9 +427,16 @@ const escalamientoRiesgo = sinergiaCases.filter(s=>s.modalidad==="mayor").length
 const ventaDiaMin = Math.round(VENTA_MES_MIN/30), ventaDiaMax = Math.round(VENTA_MES_MAX/30);
 
 function shareText(s){
-  return `Hola, necesitamos su ayuda para desbloquear un caso de servicio en ${s.establecimiento}. `
-    + `Serie ${s.serie} — falla detectada: ${s.falla}. Dirección: ${s.direccion}. `
-    + `¿Podrían ayudarnos a confirmar el contacto o autorizar el acceso para el técnico? Gracias — Solkos / Imbera.`;
+  const diasTxt = s.diasSinAtender != null ? `${s.diasSinAtender} días` : 'sin fecha registrada';
+  return `🔧 *Solkos · Caso pendiente de atención*\n\n`
+    + `🏪 Establecimiento: ${s.establecimiento}\n`
+    + `🔢 NUD: ${s.nud || 'N/D'}\n`
+    + `⚙️ Serie: ${s.serie}\n`
+    + `⚠️ Falla detectada: ${s.falla}\n`
+    + `⏱️ ${diasTxt} sin atender desde su detección\n`
+    + `📍 ${s.direccion}\n\n`
+    + `¿Podrían ayudarnos a confirmar el contacto o autorizar el acceso para el técnico? 🙏\n\n`
+    + `— Solkos / Imbera`;
 }
 
 async function nativeShare(idx, btn){
@@ -456,17 +482,23 @@ async function nativeShare(idx, btn){
 document.getElementById('sinergiaFeed').innerHTML = sinergiaCases.map((s,idx) => {
   const waLink = s.tel ? `https://wa.me/52${s.tel}?text=${encodeURIComponent(shareText(s))}` : null;
   const mailLink = `mailto:?subject=${encodeURIComponent('Solkos · Caso pendiente de sinergia — '+s.serie)}&body=${encodeURIComponent(shareText(s))}`;
+  const dias = s.diasSinAtender;
+  const urgente = dias != null && dias >= 30;
   return `
   <div class="case tag-improductivo">
     <div class="case-top">
-      <div class="case-id">Serie <b>${s.serie}</b> · ${s.establecimiento}</div>
+      <div>
+        <div class="sinergia-estab">${s.establecimiento || 'Establecimiento sin nombre registrado'}</div>
+        <div class="case-id">Serie <b>${s.serie}</b> · NUD <b>${s.nud || 'N/D'}</b></div>
+      </div>
       <div class="badgerow">
         <span class="badge costo">Riesgo: Servicio ${s.modalidad==="mayor"?"Mayor":"Menor"}</span>
         <span class="badge improductivo">Recibido — pendiente</span>
       </div>
     </div>
+    <div class="dias-sin-atender ${urgente?'urgente':''}">⏱️ ${dias != null ? `${dias} días` : 'Fecha de detección no registrada'} sin atender desde que se detectó la falla</div>
     <div class="status-line open">● Recibido, pendiente de contacto o autorización</div>
-    <div class="falla">Falla detectada: <b>${s.falla}</b>. Si el equipo llega a fallar por completo, se suma el costo de un kit de llenado de refrigerante ($${KIT_REFRI_MIN.toLocaleString('es-MX')}–$${KIT_REFRI_MAX.toLocaleString('es-MX')}).</div>
+    <div class="falla">Falla detectada: <b>${s.falla}</b>.</div>
 
     <div class="contactbox">
       <div class="cb-row"><span class="cb-lbl">Contacto</span><span class="cb-val">${s.contacto ? s.contacto : '<i>No registrado en Airtable</i>'}</span></div>
@@ -478,6 +510,7 @@ document.getElementById('sinergiaFeed').innerHTML = sinergiaCases.map((s,idx) =>
       <button class="sharebtn native" onclick="nativeShare(${idx}, this)">⤴ Compartir</button>
       ${waLink ? `<a class="sharebtn wa" href="${waLink}" target="_blank">↗ WhatsApp directo</a>` : `<span class="sharebtn disabled">Sin teléfono para WhatsApp directo</span>`}
       <a class="sharebtn mail" href="${mailLink}">✉ Correo directo</a>
+      ${s.evidenciaLink ? `<a class="sharebtn evidencia" href="${s.evidenciaLink}" target="_blank">📎 Ver Evidencias</a>` : `<span class="sharebtn disabled">Sin evidencia registrada</span>`}
     </div>
   </div>
 `;
@@ -506,7 +539,10 @@ function caseCard(c, isNew){
   return `
     <div class="case tag-${c.dictamen}">
       <div class="case-top">
-        <div class="case-id">${c.os ? `OS <b>${c.os}</b> · Serie ${c.serie}` : `Serie <b>${c.serie}</b> · sin OS aún`}</div>
+        <div>
+          ${c.establecimiento ? `<div class="sinergia-estab">${c.establecimiento}</div>` : ''}
+          <div class="case-id">${c.os ? `OS <b>${c.os}</b> · Serie ${c.serie}` : `Serie <b>${c.serie}</b> · sin OS aún`}${c.nud ? ` · NUD <b>${c.nud}</b>` : ''}</div>
+        </div>
         <div class="badgerow">
           ${isNew ? '<span class="badge nuevo"><span class="dot"></span>Nuevo</span>' : (c.updatedToday ? '<span class="badge nuevo"><span class="dot"></span>Actualizado hoy</span>' : '')}
           ${c.costo != null ? `<span class="badge costo">${money(c.costo)}</span>` : ''}
@@ -747,7 +783,7 @@ function renderDayCards(casos){
   visible.forEach(c => { (byDate[c.creado] = byDate[c.creado]||[]).push(c); });
   const dates = Object.keys(byDate).sort((a,b)=> a<b?1:-1);
 
-  feed.innerHTML = dates.map((d,i) => {
+  const buildDayCard = (d) => {
     const items = byDate[d];
     const isToday = d === HOY;
     const cards = items.map(c => caseCard(c, isToday)).join('');
@@ -777,7 +813,23 @@ function renderDayCards(casos){
         </div>
       </div>
     `;
-  }).join('');
+  };
+
+  const RECENT_DAYS = 7;
+  const recentDates = dates.slice(0, RECENT_DAYS);
+  const olderDates = dates.slice(RECENT_DAYS);
+
+  let html = recentDates.map(buildDayCard).join('');
+  if(olderDates.length > 0){
+    html += `
+      <div class="older-toggle" onclick="document.getElementById('olderFeed').classList.toggle('open'); this.classList.toggle('open')">
+        <span>Ver ${olderDates.length} día${olderDates.length>1?'s':''} anteriores</span>
+        <span class="ot-chev">▾</span>
+      </div>
+      <div class="older-feed" id="olderFeed">${olderDates.map(buildDayCard).join('')}</div>
+    `;
+  }
+  feed.innerHTML = html;
 }
 
 function renderFeed(casos){
