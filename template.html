@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Boletín Solkos — Alpura</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --cream:#0A1830;
+    --card:#132B4F;
+    --polar:#1D3A63;
+    --line:rgba(255,255,255,0.08);
+    --navy:#4FD8EC;
+    --near-black:#13181B;
+    --text-strong:#F4F7FC;
+    --amber:#F5A623;
+    --coral:#E6207A;
+    --ink:#F4F7FC;
+    --ink-soft:#8FA0C0;
+    --ink-dim:#5C6C8C;
+    --success:#33D68A;
+    --danger:#FF6B6B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:70px;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- HEADER ---------- */
+  header{padding:40px 0 0 0;}
+  .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;}
+  .lockup{display:flex;align-items:center;gap:10px;}
+  .mark{width:26px;height:26px;border-radius:7px;flex:none;background:linear-gradient(135deg,var(--coral),#8B2E63);position:relative;}
+  .mark::after{content:"";position:absolute;inset:5px;background:rgba(255,255,255,0.9);border-radius:3px;}
+  .wordmark{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.3px;color:var(--navy);}
+  .wordmark span{color:var(--coral);}
+  .tag-mono{font-size:10.5px;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;}
+
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:10px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:38px;line-height:1.12;letter-spacing:-0.5px;max-width:820px;color:var(--text-strong);}
+  .sub{margin-top:12px;font-size:15px;color:var(--ink-soft);max-width:600px;line-height:1.55;}
+  .rule{height:3px;width:56px;background:var(--coral);margin:22px 0 26px 0;border-radius:3px;}
+
+  /* ---------- FILTER ---------- */
+  .filterbar{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:100px;padding:5px;width:fit-content;box-shadow:0 1px 0 rgba(0,0,0,0.02);}
+  .filterbar button{appearance:none;border:none;background:transparent;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 18px;border-radius:100px;cursor:pointer;transition:all .18s ease;}
+  .filterbar button.active{background:var(--coral);color:white;}
+  .filterbar button:not(.active):hover{color:var(--text-strong);}
+
+  /* ---------- SECTION HEADERS ---------- */
+  .sectionhead{margin:44px 0 18px 0;}
+  .sectionhead .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);letter-spacing:1px;}
+  .sectionhead h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;margin-top:4px;color:var(--text-strong);}
+  .sectionhead p{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:560px;line-height:1.5;}
+
+  /* ---------- KPI STRIP ---------- */
+  .kpistrip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  .kpi{background:var(--card);padding:22px 18px;}
+  .kpi .num{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:34px;letter-spacing:-1px;}
+  .kpi .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
+  .kpi.c-navy .num{color:var(--navy);}
+  .kpi.c-coral .num{color:var(--coral);}
+  .kpi.c-amber .num{color:var(--amber);}
+  .kpi.c-black .num{color:var(--text-strong);}
+
+  /* ---------- SINERGIA ALERT BANNER ---------- */
+  .alertbanner{
+    margin-top:16px;background:#081321;border-radius:18px;padding:26px 30px;
+    display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  }
+  .alertbanner .anum{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:54px;color:var(--coral);letter-spacing:-2px;line-height:1;}
+  .alertbanner .abody{flex:1;min-width:260px;}
+  .alertbanner .atitle{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:var(--amber);}
+  .alertbanner .adesc{font-size:12.5px;color:#9BA6AE;margin-top:5px;line-height:1.5;max-width:480px;}
+  .alertbanner .achips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .alertbanner .achip{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:white;background:var(--coral);padding:5px 11px;border-radius:100px;font-weight:700;}
+
+  /* ---------- CHART ROW (grandes) ---------- */
+  .speedcard{background:#081321;border-radius:22px;padding:32px 34px;margin-top:16px;}
+  .speed-sub{font-size:12.5px;color:#9BA6AE;margin-top:6px;max-width:520px;line-height:1.5;}
+  .speed-body{display:flex;align-items:center;gap:36px;margin-top:24px;flex-wrap:wrap;}
+  .speed-stats{flex:1;min-width:260px;display:flex;flex-direction:column;gap:20px;}
+  .speed-stat{display:flex;align-items:baseline;gap:14px;}
+  .speed-stat .sdot{width:12px;height:12px;border-radius:3px;flex:none;margin-top:6px;}
+  .speed-stat .snum{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:28px;color:white;letter-spacing:-0.5px;}
+  .speed-stat .slabel{font-size:12.5px;color:#B7C0C7;line-height:1.4;max-width:340px;}
+  .speed-chartwrap{margin-top:22px;}
+  .speed-chart-title{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#9BA6AE;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+  .speed-savings{
+    margin-top:26px;padding-top:22px;border-top:1px solid rgba(255,255,255,0.1);
+    display:flex;gap:32px;flex-wrap:wrap;
+  }
+  .ssv-item .ssv-num{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:26px;color:var(--amber);letter-spacing:-0.5px;}
+  .ssv-item .ssv-lbl{font-size:11.5px;color:#B7C0C7;margin-top:4px;max-width:260px;line-height:1.4;}
+  .chartrow{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px;}
+  .chartcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 24px 20px 24px;}
+  .chartcard .ctitle{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px;color:var(--text-strong);}
+  .donutwrap{display:flex;align-items:center;gap:22px;}
+  .legend2{display:flex;flex-direction:column;gap:8px;font-size:12px;}
+  .legend2.legend-row{flex-direction:row;flex-wrap:wrap;gap:14px;margin-top:4px;justify-content:center;}
+  .legend2 .li{display:flex;align-items:center;gap:7px;color:var(--ink-soft);}
+  .legend2 .sw{width:9px;height:9px;border-radius:2px;flex:none;}
+  .legend2 b{color:var(--text-strong);}
+
+  .sparkviz{display:flex;align-items:flex-end;gap:5px;height:170px;}
+  .sparkviz .b{flex:1;background:var(--polar);border-radius:4px 4px 0 0;}
+  .sparkviz .b.on{background:linear-gradient(180deg,var(--navy),var(--coral));}
+  .sparkdays{display:flex;gap:5px;margin-top:8px;}
+  .sparkdays span{flex:1;text-align:center;font-size:9.5px;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;}
+
+  .timeline-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px;}
+  .tl-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);}
+  .tl-dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .tl-dot.hollow{background:transparent;border:1.5px dashed var(--ink-dim);}
+
+  /* ---------- VALUE CARDS ---------- */
+  .valuegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+  .valuecard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;}
+  .valuecard .vlabel{font-size:11px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.5px;font-family:'JetBrains Mono',monospace;}
+  .valuecard .vnum{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:25px;margin-top:6px;letter-spacing:-0.5px;color:var(--text-strong);}
+  .valuecard .vsub{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.45;}
+  .barmini{display:flex;align-items:flex-end;gap:14px;height:64px;margin-top:10px;}
+  .barmini .bc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .barmini .bar{width:100%;border-radius:4px 4px 0 0;}
+  .barmini .bv{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;margin-bottom:4px;color:var(--text-strong);}
+
+  /* ---------- CALENDAR STRIP ---------- */
+  .calstrip{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding:4px 2px 14px 2px;margin-bottom:4px;-webkit-overflow-scrolling:touch;}
+  .cal-month-div{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;padding:0 4px;}
+  .cal-month-div::before{content:"";display:block;width:1px;flex:1;background:var(--line);margin:0 auto 6px auto;}
+  .cal-month-div span{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.6px;writing-mode:vertical-rl;text-orientation:mixed;}
+  .cal-month-div::after{content:"";display:block;width:1px;flex:1;background:var(--line);margin:6px auto 0 auto;}
+  .calstrip::-webkit-scrollbar{height:5px;}
+  .calstrip::-webkit-scrollbar-thumb{background:var(--polar);border-radius:10px;}
+  .calchip{flex:none;width:60px;padding:10px 0 9px 0;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:center;cursor:pointer;transition:all .15s ease;}
+  .calchip:hover{border-color:var(--coral);}
+  .calchip.active{background:var(--coral);border-color:var(--coral);}
+  .calchip .cw{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.4px;}
+  .calchip.active .cw{color:#F3C6DC;}
+  .calchip .cd{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:18px;color:var(--text-strong);margin-top:2px;}
+  .calchip.active .cd{color:white;}
+  .calchip .cc{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink-dim);margin-top:3px;}
+  .calchip.active .cc{color:var(--amber);}
+  .calchip.empty{opacity:0.35;}
+  .calchip.reset{background:var(--polar);border-style:dashed;}
+
+  /* ---------- BIG DAY CARDS ---------- */
+  .daycard{
+    border-radius:18px;overflow:hidden;margin-bottom:12px;cursor:pointer;
+    border:2px solid transparent;
+    background:
+      linear-gradient(var(--card), var(--card)) padding-box,
+      linear-gradient(180deg,#4FD8EC,#E6207A) border-box;
+  }
+  .daycard-head{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--card);}
+  .daycard-head .dh-date{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:var(--text-strong);}
+  .daycard-head .dh-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-soft);margin-top:2px;text-transform:none;letter-spacing:0.2px;font-weight:600;}
+  .daycard-head .dh-right{display:flex;align-items:center;gap:14px;}
+  .daycard-head .dh-num{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:40px;color:var(--text-strong);letter-spacing:-1px;line-height:1;}
+  .daycard-head .dh-chev{font-size:16px;color:var(--ink-soft);transition:transform .2s ease;}
+  .daycard.open .dh-chev{transform:rotate(180deg);}
+  .daycard-body{background:var(--card);padding:0 20px 20px 20px;display:none;}
+  .daycard.open .daycard-body{display:block;padding-top:18px;}
+
+  /* ---------- FEED (tarjetas dentro del día expandido) ---------- */
+  .feed{margin-top:8px;}
+  .day-divider{display:flex;align-items:center;gap:12px;margin:26px 0 14px 0;}
+  .day-divider .line{flex:1;height:1px;background:var(--line);}
+  .day-divider .dlabel{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink-soft);white-space:nowrap;display:flex;align-items:center;gap:8px;}
+  .pill-count{font-size:10px;background:rgba(79,216,236,0.10);color:var(--navy);padding:2px 9px;border-radius:100px;font-weight:700;}
+
+  .cases{display:flex;flex-direction:column;gap:12px;}
+  .case{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,30,0.03);}
+  .case::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .case.tag-cliente::before{background:var(--navy);}
+  .case.tag-garantia::before{background:var(--success);}
+  .case.tag-noefectivo::before{background:var(--amber);}
+  .case.tag-improductivo::before{background:var(--danger);}
+  .case.tag-proceso::before{background:var(--polar);}
+
+  .case-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+  .case-id{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);}
+  .case-id b{color:var(--text-strong);font-size:13.5px;}
+  .badgerow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.4px;text-transform:uppercase;padding:4px 9px;border-radius:100px;font-weight:700;white-space:nowrap;}
+  .badge.cliente{background:rgba(79,216,236,0.14);color:var(--navy);}
+  .badge.garantia{background:rgba(51,214,138,0.14);color:var(--success);}
+  .badge.noefectivo{background:rgba(245,166,35,0.16);color:var(--amber);}
+  .badge.improductivo{background:rgba(255,107,107,0.16);color:var(--danger);}
+  .badge.proceso{background:rgba(143,160,192,0.16);color:var(--ink-soft);}
+  .badge.nuevo{background:var(--coral);color:white;display:flex;align-items:center;gap:4px;}
+  .badge.nuevo .dot{width:5px;height:5px;border-radius:50%;background:white;animation:pulse 1.6s infinite;}
+  .badge.costo{background:rgba(255,255,255,0.1);color:var(--text-strong);font-family:'JetBrains Mono',monospace;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+  .status-line{margin-top:9px;font-size:13.5px;font-weight:600;}
+  .status-line.done{color:var(--success);}
+  .status-line.open{color:var(--amber);}
+  .falla{margin-top:4px;font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .falla b{color:var(--text-strong);font-weight:600;}
+
+  .trace{margin-top:16px;}
+  .trace-track{position:relative;height:2px;background:var(--line);border-radius:2px;margin:0 6px;}
+  .trace-fill{position:absolute;left:0;top:0;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--navy),var(--coral));}
+  .trace-fill.pending{background:linear-gradient(90deg,var(--navy),var(--amber));}
+  .trace-pts{display:flex;justify-content:space-between;margin-top:9px;}
+  .trace-pt{text-align:left;max-width:34%;}
+  .trace-pt:last-child{text-align:right;}
+  .trace-pt .dot2{width:7px;height:7px;border-radius:50%;background:var(--navy);display:inline-block;margin-bottom:5px;}
+  .trace-pt.end .dot2{background:var(--coral);}
+  .trace-pt.pending .dot2{background:var(--amber);}
+  .trace-lbl{font-size:9.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.4px;font-family:'JetBrains Mono',monospace;}
+  .trace-date{font-size:11.5px;color:var(--text-strong);margin-top:2px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .trace-delta{font-size:10px;color:var(--ink-soft);margin-top:2px;}
+
+  .case-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .contact{font-size:11.5px;color:var(--ink-soft);}
+  .pdf-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--navy);display:flex;align-items:center;gap:6px;text-decoration:none;border:1px solid rgba(79,216,236,0.3);padding:5px 11px;border-radius:8px;}
+
+  .empty-state{border:1px dashed var(--line);border-radius:14px;padding:16px 20px;color:var(--ink-dim);font-size:12.5px;background:rgba(255,255,255,0.02);}
+
+  .contactbox{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:12px;display:flex;flex-direction:column;gap:6px;}
+  .cb-row{display:flex;gap:10px;font-size:12px;}
+  .cb-lbl{width:74px;flex:none;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;padding-top:1px;}
+  .cb-val{color:var(--text-strong);font-weight:600;}
+  .cb-val i{color:var(--ink-dim);font-style:normal;font-weight:500;}
+
+  .sharebtns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .sharebtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px 16px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:none;cursor:pointer;}
+  .sharebtn.native{background:var(--coral);color:white;}
+  .sharebtn.wa{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);}
+  .sharebtn.mail{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);}
+  .sharebtn.disabled{background:transparent;color:var(--ink-dim);border:1px dashed var(--line);cursor:default;}
+
+  .sharefallback{display:none;margin-top:10px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:10px;}
+  .sharefallback .sf-lbl{font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
+  .sharefallback .sf-ok{font-size:12px;color:var(--success);font-weight:600;}
+  .sharefallback textarea{width:100%;min-height:70px;background:rgba(0,0,0,0.2);border:1px solid var(--line);border-radius:8px;color:var(--text-strong);font-family:'Inter',sans-serif;font-size:12px;padding:8px;resize:vertical;}
+
+  footer{max-width:960px;margin:50px auto 0 auto;padding:22px 28px 0 28px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-dim);text-align:center;}
+
+  @media (max-width:640px){
+    .kpistrip{grid-template-columns:repeat(2,1fr);}
+    .chartrow{grid-template-columns:1fr;}
+    .valuegrid{grid-template-columns:1fr;}
+    h1{font-size:27px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brandrow">
+      <div class="lockup">
+        <div class="mark"></div>
+        <div>
+          <div class="wordmark">sol<span>kos</span></div>
+          <div class="tag-mono">Powered by Imbera</div>
+        </div>
+      </div>
+      <div class="tag-mono" style="text-align:right;">Boletín de Servicios<br>Cliente: Alpura</div>
+    </div>
+
+    <div class="eyebrow">Boletín predictivo recurrente</div>
+    <h1>Servicios por Telemetría Solkos</h1>
+    <p class="sub">Datos en vivo desde Solkos, a partir de julio 2026. El filtro corre sobre la fecha de creación de cada caso — cambia el rango y todo se recalcula.</p>
+    <div class="rule"></div>
+
+    <div class="filterbar" id="filterbar">
+      <button data-range="hoy">Hoy</button>
+      <button data-range="7d">Últimos 7 días</button>
+      <button data-range="mes" class="active">Último mes</button>
+      <button data-range="todos">Todos los servicios</button>
+    </div>
+  </header>
+
+  <div class="sectionhead">
+    <div class="num">VALOR GENERADO</div>
+    <h2>Valores Generados</h2>
+  </div>
+
+  <div class="kpistrip" id="kpiStrip"></div>
+
+  <div class="alertbanner">
+    <div class="anum" id="sinergiaNum">4</div>
+    <div class="abody">
+      <div class="atitle">Requieren tu ayuda para desbloquearse</div>
+      <div class="adesc">Telemetría ya detectó el patrón — estos casos no avanzan hasta que Alpura ayude a confirmar contacto o dar acceso al punto de venta.</div>
+      <div class="achips" id="sinergiaChips"></div>
+    </div>
+  </div>
+
+  <div class="speedcard">
+    <div class="speed-head">
+      <div class="ctitle" style="font-size:17px;color:#F5A623;">Velocidad de respuesta — de la falla a la atención</div>
+      <p class="speed-sub">Los tres momentos que importan: cuándo se detecta, cuándo se crea la orden, y cuándo queda atendido el servicio.</p>
+    </div>
+    <div class="speed-body">
+      <div class="speed-stats" id="speedStats"></div>
+    </div>
+    <div class="speed-chartwrap">
+      <div class="speed-chart-title">Días de atención por caso — con línea de promedio</div>
+      <svg id="speedLineChart" width="100%" height="220" viewBox="0 0 640 220"></svg>
+    </div>
+    <div class="speed-savings" id="speedSavings"></div>
+  </div>
+
+  <div class="chartrow">
+    <div class="chartcard">
+      <div class="ctitle">Distribución por dictamen</div>
+      <svg id="donutChart" width="100%" height="245" viewBox="0 0 320 245" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="legend2 legend-row" id="donutLegend"></div>
+    </div>
+    <div class="chartcard">
+      <div class="ctitle">Línea de tiempo de cierres</div>
+      <div class="timeline-legend">
+        <span class="tl-item"><span class="tl-dot" style="background:#4FD8EC"></span>Cerrado con éxito</span>
+        <span class="tl-item"><span class="tl-dot" style="background:#F5A623"></span>Improductivo</span>
+        <span class="tl-item"><span class="tl-dot hollow"></span>En proceso, estimado</span>
+      </div>
+      <svg id="timelineChart" width="100%" height="150" viewBox="0 0 640 150"></svg>
+    </div>
+  </div>
+
+  <div class="valuegrid" id="valueGrid"></div>
+
+  <div class="sectionhead">
+    <div class="num" id="feedCount">SERVICIOS</div>
+    <h2>Casos detectados por telemetría</h2>
+    <p>Toca un día en el calendario para acotar, o toca una tarjeta para ver el detalle completo.</p>
+  </div>
+  <div class="calstrip" id="calStrip"></div>
+  <div class="feed" id="feed"></div>
+
+  <div class="sectionhead">
+    <div class="num">SINERGIA</div>
+    <h2>Requiere sinergia con Alpura</h2>
+    <p>Detalle de los casos bloqueados por contacto o acceso — el resumen está arriba en la alerta.</p>
+  </div>
+  <div class="cases" id="sinergiaFeed"></div>
+  <p style="font-size:12px;color:var(--ink-dim);margin-top:14px;">El caso de El Granjero del Ahorro (arriba, en servicios) también aparece aquí — la falta de acceso es el mismo tipo de bloqueo.</p>
+
+  <footer>
+    Generado automáticamente desde Consola Solkos · Módulo de Servicios — Cliente Alpura · Datos desde julio 2026<br>
+    Mockup de diseño — la cadencia de envío (correo / WhatsApp) se define en un paso posterior.
+  </footer>
+</div>
+
+<script>
+const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function fmt(iso){ if(!iso) return null; const [y,m,d]=iso.split("-").map(Number); return `${d} ${MESES[m-1]} ${y}`; }
+function diffDays(a,b){ return Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00:00")) / 86400000); }
+function addDays(iso, n){ const d = new Date(iso+"T00:00:00"); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function money(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
+
+const PRECIO_MENOR = 920;
+const PRECIO_MAYOR = 1860;
+const KIT_REFRI_MIN = 4000, KIT_REFRI_MAX = 4500;
+const VENTA_MES_MIN = 2500, VENTA_MES_MAX = 3000;
+const TARDANZA_SIN_TELEMETRIA = 10; // días asumidos de tardanza si no se detectara por telemetría
+const HOY = "__HOY__";
+
+// ---- Datos en vivo desde Airtable, a partir de julio 2026 ----
+const rawCases = __RAW_CASES__;
+
+const sinergiaCases = __SINERGIA_CASES__;
+
+const baseDate = rawCases.reduce((min,c)=> c.creado < min ? c.creado : min, rawCases[0].creado);
+
+function buildTrace(c){
+  const trace = [{lbl:"OS generada", date: fmt(c.creado)}];
+  if(c.cierre){
+    trace.push({lbl: c.dictamen==="improductivo" ? "Cierre (improductivo)" : "Cierre",
+      date: fmt(c.cierre), delta:`+${diffDays(c.creado,c.cierre)} día(s)`, end:true});
+  } else {
+    trace.push({lbl:"Estatus actual", date:"En proceso", delta:"sin cerrar aún", end:true, pending:true});
+  }
+  return trace;
+}
+
+const allCases = rawCases.map(c => ({
+  ...c,
+  statusText: !c.cierre ? "En proceso" : (c.dictamen==="improductivo" ? "Cerrado como improductivo" : (c.dictamen==="noefectivo" ? "Cerrado — no efectivo" : "Completado")),
+  statusClass: (!c.cierre || c.dictamen==="improductivo" || c.dictamen==="noefectivo") ? "open" : "done",
+  trace: buildTrace(c)
+}));
+
+// ---- Sinergia: banner + detalle (no depende del filtro de fecha, es backlog vivo) ----
+document.getElementById('sinergiaNum').textContent = sinergiaCases.length;
+document.getElementById('sinergiaChips').innerHTML = sinergiaCases.map(s=>`<span class="achip">${s.serie}</span>`).join('');
+const mermaEnRiesgo = sinergiaCases.length * ((KIT_REFRI_MIN+KIT_REFRI_MAX)/2);
+const escalamientoRiesgo = sinergiaCases.filter(s=>s.modalidad==="mayor").length * PRECIO_MAYOR;
+const ventaDiaMin = Math.round(VENTA_MES_MIN/30), ventaDiaMax = Math.round(VENTA_MES_MAX/30);
+
+function shareText(s){
+  return `Hola, necesitamos su ayuda para desbloquear un caso de servicio en ${s.establecimiento}. `
+    + `Serie ${s.serie} — falla detectada: ${s.falla}. Dirección: ${s.direccion}. `
+    + `¿Podrían ayudarnos a confirmar el contacto o autorizar el acceso para el técnico? Gracias — Solkos / Imbera.`;
+}
+
+async function nativeShare(idx, btn){
+  const s = sinergiaCases[idx];
+  const text = shareText(s);
+  const title = `Solkos · Caso ${s.serie}`;
+
+  if(navigator.share){
+    try{ await navigator.share({title, text}); return; }
+    catch(e){ /* usuario canceló el share sheet, no hacer nada */ return; }
+  }
+
+  // Intenta portapapeles; si el navegador/entorno lo bloquea (común en previews con iframe),
+  // cae al respaldo visible de abajo — nunca depende de alert() ni de permisos.
+  let copied = false;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    }
+  }catch(e){ copied = false; }
+
+  const card = btn.closest('.case');
+  let box = card.querySelector('.sharefallback');
+  if(!box){
+    box = document.createElement('div');
+    box.className = 'sharefallback';
+    card.querySelector('.sharebtns').insertAdjacentElement('afterend', box);
+  }
+  box.innerHTML = copied
+    ? `<div class="sf-ok">✓ Copiado al portapapeles</div>`
+    : `<div class="sf-lbl">No se pudo copiar automáticamente — selecciona y copia el texto:</div>
+       <textarea readonly onclick="this.select()">${text}</textarea>`;
+  box.style.display = 'block';
+  if(!copied){
+    const ta = box.querySelector('textarea');
+    ta.focus(); ta.select();
+  } else {
+    setTimeout(()=>{ box.style.display='none'; }, 2500);
+  }
+}
+
+document.getElementById('sinergiaFeed').innerHTML = sinergiaCases.map((s,idx) => {
+  const waLink = s.tel ? `https://wa.me/52${s.tel}?text=${encodeURIComponent(shareText(s))}` : null;
+  const mailLink = `mailto:?subject=${encodeURIComponent('Solkos · Caso pendiente de sinergia — '+s.serie)}&body=${encodeURIComponent(shareText(s))}`;
+  return `
+  <div class="case tag-improductivo">
+    <div class="case-top">
+      <div class="case-id">Serie <b>${s.serie}</b> · ${s.establecimiento}</div>
+      <div class="badgerow">
+        <span class="badge costo">Riesgo: Servicio ${s.modalidad==="mayor"?"Mayor":"Menor"}</span>
+        <span class="badge improductivo">Recibido — pendiente</span>
+      </div>
+    </div>
+    <div class="status-line open">● Recibido, pendiente de contacto o autorización</div>
+    <div class="falla">Falla detectada: <b>${s.falla}</b>. Si el equipo llega a fallar por completo, se suma el costo de un kit de llenado de refrigerante ($${KIT_REFRI_MIN.toLocaleString('es-MX')}–$${KIT_REFRI_MAX.toLocaleString('es-MX')}).</div>
+
+    <div class="contactbox">
+      <div class="cb-row"><span class="cb-lbl">Contacto</span><span class="cb-val">${s.contacto ? s.contacto : '<i>No registrado en Airtable</i>'}</span></div>
+      <div class="cb-row"><span class="cb-lbl">Teléfono</span><span class="cb-val">${s.tel ? s.tel : '<i>No registrado</i>'}</span></div>
+      <div class="cb-row"><span class="cb-lbl">Dirección</span><span class="cb-val">${s.direccion}</span></div>
+    </div>
+
+    <div class="sharebtns">
+      <button class="sharebtn native" onclick="nativeShare(${idx}, this)">⤴ Compartir</button>
+      ${waLink ? `<a class="sharebtn wa" href="${waLink}" target="_blank">↗ WhatsApp directo</a>` : `<span class="sharebtn disabled">Sin teléfono para WhatsApp directo</span>`}
+      <a class="sharebtn mail" href="${mailLink}">✉ Correo directo</a>
+    </div>
+  </div>
+`;
+}).join('');
+
+// ==================== TODO LO DEMÁS ES REACTIVO AL FILTRO ====================
+
+function rangeStart(range){
+  if(range==='hoy') return HOY;
+  if(range==='7d'){ const d=new Date(HOY+"T00:00:00"); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); }
+  if(range==='mes'){ const d=new Date(HOY+"T00:00:00"); d.setDate(d.getDate()-29); return d.toISOString().slice(0,10); }
+  return baseDate; // todos
+}
+
+function caseCard(c, isNew){
+  const anyPending = c.trace.some(t=>t.pending);
+  const fillClass = anyPending ? 'trace-fill pending' : 'trace-fill';
+  const ptsHtml = c.trace.map(t => `
+    <div class="trace-pt${t.end?' end':''}${t.pending?' pending':''}">
+      <span class="dot2"></span>
+      <div class="trace-lbl">${t.lbl}</div>
+      <div class="trace-date">${t.date}</div>
+      ${t.delta ? `<div class="trace-delta">${t.delta}</div>` : ''}
+    </div>
+  `).join('');
+  return `
+    <div class="case tag-${c.dictamen}">
+      <div class="case-top">
+        <div class="case-id">${c.os ? `OS <b>${c.os}</b> · Serie ${c.serie}` : `Serie <b>${c.serie}</b> · sin OS aún`}</div>
+        <div class="badgerow">
+          ${isNew ? '<span class="badge nuevo"><span class="dot"></span>Nuevo</span>' : (c.updatedToday ? '<span class="badge nuevo"><span class="dot"></span>Actualizado hoy</span>' : '')}
+          ${c.costo != null ? `<span class="badge costo">${money(c.costo)}</span>` : ''}
+          <span class="badge ${c.dictamen}">Dictamen: ${c.label}</span>
+        </div>
+      </div>
+      <div class="status-line ${c.statusClass}">● ${c.statusText}</div>
+      <div class="falla">Falla detectada: <b>${c.falla}</b>. ${c.detail}</div>
+      <div class="trace">
+        <div class="trace-track"><div class="${fillClass}" style="width:100%"></div></div>
+        <div class="trace-pts">${ptsHtml}</div>
+      </div>
+      ${c.os ? `<div class="case-foot"><div class="contact">Seguimiento vía Consola Solkos</div><a class="pdf-link" href="#">↗ Ver evidencia OS</a></div>` : ''}
+    </div>
+  `;
+}
+
+function renderKpiStrip(casos){
+  const efectivas = casos.filter(c=>c.dictamen==="cliente"||c.dictamen==="garantia").length;
+  const costoReal = casos.reduce((s,c)=>s+(c.costo||0),0);
+  const pct = casos.length ? Math.round(efectivas/casos.length*100) : 0;
+  document.getElementById('kpiStrip').innerHTML = `
+    <div class="kpi c-navy"><div class="num">${casos.length}</div><div class="lbl">Casos detectados por telemetría</div></div>
+    <div class="kpi c-black"><div class="num">${pct}%</div><div class="lbl">Efectivos — falla confirmada y resuelta</div></div>
+    <div class="kpi c-amber"><div class="num">${money(costoReal)}</div><div class="lbl">Costo real de servicios del periodo</div></div>
+    <div class="kpi c-coral"><div class="num">${sinergiaCases.length}</div><div class="lbl">Casos requieren sinergia con Alpura</div></div>
+  `;
+}
+
+function renderDonut(casos){
+  const counts = {};
+  casos.forEach(c => counts[c.dictamen] = (counts[c.dictamen]||0)+1);
+  const colors = {cliente:'#4FD8EC', garantia:'#33D68A', noefectivo:'#F5A623', improductivo:'#FF6B6B', proceso:'#8FA0C0'};
+  const labels = {cliente:'Cliente', garantia:'Garantía', noefectivo:'No efectivo', improductivo:'Improductivo', proceso:'En diagnóstico'};
+  const order = ['cliente','garantia','noefectivo','improductivo','proceso'];
+  const total = casos.length;
+  const svgEl = document.getElementById('donutChart');
+
+  if(total===0){
+    svgEl.innerHTML = `<text x="160" y="110" text-anchor="middle" font-family="Inter" font-size="12" fill="#5C6C8C">Sin casos en este rango</text>`;
+    return;
+  }
+
+  const cx=160, cy=200, r=100, sw=30;
+  const C = 2*Math.PI*r, halfC = Math.PI*r;
+  const pt = (deg) => [cx + r*Math.cos(deg*Math.PI/180), cy + r*Math.sin(deg*Math.PI/180)];
+
+  // pista de fondo (medio círculo)
+  let svg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1D3A63" stroke-width="${sw}"
+    stroke-dasharray="${halfC} ${halfC}" transform="rotate(180 ${cx} ${cy})"/>`;
+
+  let cum = 0;
+  const active = order.filter(k=>counts[k]);
+  const labelPositions = [];
+
+  active.forEach((key,i)=>{
+    const n = counts[key];
+    const frac = n/total;
+    const len = frac*halfC;
+    const rotStart = 180 + cum*180;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[key]}" stroke-width="${sw}"
+      stroke-dasharray="${len} ${C-len}" transform="rotate(${rotStart} ${cx} ${cy})" stroke-linecap="butt"/>`;
+
+    const midDeg = 180 + (cum + frac/2)*180;
+    const [ax,ay] = pt(midDeg);
+    const tier = i % 3; // 3 alturas para evitar choques entre segmentos angostos vecinos
+    const labelY = ay - 32 - tier*20;
+    labelPositions.push({ax, ay, labelY, pct: Math.round(frac*100), color: colors[key]});
+    cum += frac;
+  });
+
+  labelPositions.forEach(p=>{
+    svg += `<line x1="${p.ax}" y1="${p.ay-sw/2-2}" x2="${p.ax}" y2="${p.labelY+7}" stroke="${p.color}" stroke-width="1.5"/>
+      <circle cx="${p.ax}" cy="${p.ay-sw/2-2}" r="3" fill="${p.color}"/>
+      <text x="${p.ax}" y="${p.labelY}" text-anchor="middle" font-family="Space Grotesk" font-weight="800" font-size="19" fill="#F4F7FC">${p.pct}%</text>`;
+  });
+
+  svg += `<text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="Space Grotesk" font-weight="800" font-size="36" fill="#F4F7FC">${total}</text>
+          <text x="${cx}" y="${cy+13}" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="#8FA0C0">casos totales</text>`;
+
+  svgEl.innerHTML = svg;
+  document.getElementById('donutLegend').innerHTML = active.map(k=>
+    `<div class="li"><span class="sw" style="background:${colors[k]}"></span><b>${counts[k]}</b>&nbsp;${labels[k]}</div>`
+  ).join('');
+}
+
+function renderTimeline(casos){
+  const svg = document.getElementById('timelineChart');
+  const width = Math.max(Math.round(svg.getBoundingClientRect().width) || 640, 320);
+  const height = 150;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.removeAttribute('preserveAspectRatio');
+
+  if(casos.length === 0){
+    svg.innerHTML = `<text x="${width/2}" y="75" text-anchor="middle" font-family="Inter" font-size="12" fill="#5C6C8C">Sin casos en este rango</text>`;
+    return;
+  }
+
+  const points = casos.map(c=>{
+    const closedSuccess = c.dictamen==='cliente' || c.dictamen==='garantia';
+    const projected = !c.cierre;
+    const plotDate = c.cierre ? c.cierre : addDays(c.creado, 3);
+    const color = projected ? '#8FA0C0' : (closedSuccess ? '#4FD8EC' : '#F5A623');
+    return {date: plotDate, color, projected};
+  });
+
+  const allDates = casos.map(c=>c.creado).concat(points.map(p=>p.date)).concat([HOY]);
+  const rangeStart = allDates.reduce((a,b)=> a<b?a:b);
+  const rangeEnd = allDates.reduce((a,b)=> a>b?a:b);
+  const totalDays = Math.max(diffDays(rangeStart, rangeEnd), 1);
+
+  const marginL = 34, marginR = 34;
+  const usableW = width - marginL - marginR;
+  const xPos = (iso) => marginL + (diffDays(rangeStart, iso)/totalDays) * usableW;
+  const axisY = 100;
+  const nowX = xPos(HOY);
+
+  // líneas divisorias tenues por día, más marcadas al inicio de cada mes
+  let gridSvg = '';
+  for(let i=0;i<=totalDays;i++){
+    const d = addDays(rangeStart, i);
+    const gx = xPos(d);
+    const isMonthStart = d.slice(-2) === '01';
+    gridSvg += `<line x1="${gx}" y1="${axisY-48}" x2="${gx}" y2="${axisY+6}" stroke="${isMonthStart?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.045)'}" stroke-width="1"/>`;
+    if(isMonthStart){
+      const mm = parseInt(d.split('-')[1]);
+      gridSvg += `<text x="${gx+4}" y="${axisY-40}" font-family="JetBrains Mono" font-size="8.5" fill="#5C6C8C">${MESES[mm-1]}</text>`;
+    }
+  }
+
+  const byDate = {};
+  points.forEach(p=>{ (byDate[p.date]=byDate[p.date]||[]).push(p); });
+
+  let dotsSvg = '';
+  Object.keys(byDate).forEach(d=>{
+    byDate[d].forEach((p,i)=>{
+      const cx = xPos(d), cy = axisY - 24 - i*18;
+      dotsSvg += p.projected
+        ? `<circle cx="${cx}" cy="${cy}" r="6" fill="#0F2340" stroke="#8FA0C0" stroke-width="1.5" stroke-dasharray="2,2"/>`
+        : `<circle cx="${cx}" cy="${cy}" r="6" fill="${p.color}"/>`;
+    });
+  });
+
+  let axisSvg = `<line x1="${marginL}" y1="${axisY}" x2="${Math.min(nowX,width-marginR)}" y2="${axisY}" stroke="#3A4E6B" stroke-width="3" stroke-linecap="round"/>`;
+  if(nowX < width - marginR){
+    axisSvg += `<line x1="${nowX}" y1="${axisY}" x2="${width-marginR}" y2="${axisY}" stroke="#3A4E6B" stroke-width="3" stroke-dasharray="1,7" stroke-linecap="round"/>`;
+  }
+
+  const nowSvg = `<line x1="${nowX}" y1="${axisY-40}" x2="${nowX}" y2="${axisY+8}" stroke="#E6207A" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <rect x="${nowX-22}" y="${axisY+12}" width="44" height="18" rx="9" fill="#E6207A"/>
+    <text x="${nowX}" y="${axisY+24.5}" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="white">HOY</text>`;
+
+  const lbl = (iso) => { const [y,m,d]=iso.split('-'); return `${parseInt(d)} ${MESES[parseInt(m)-1]}`; };
+  const labelsSvg = `<text x="${marginL}" y="${axisY+45}" font-family="JetBrains Mono" font-size="9" fill="#5C6C8C">${lbl(rangeStart)}</text>
+    <text x="${width-marginR}" y="${axisY+45}" text-anchor="end" font-family="JetBrains Mono" font-size="9" fill="#5C6C8C">${lbl(rangeEnd)}</text>`;
+
+  svg.innerHTML = gridSvg + axisSvg + labelsSvg + nowSvg + dotsSvg;
+}
+
+function renderValueGrid(casos){
+  const diagCertero = casos.filter(c=>c.dictamen==="cliente").length;
+  const ahorroDiag = diagCertero*(PRECIO_MAYOR-PRECIO_MENOR);
+  const cerradosArr = casos.filter(c=>c.cierre);
+  const cerrados = cerradosArr.length;
+  const costoRealPeriodo = cerradosArr.reduce((s,c)=>s+(c.costo||0),0);
+  const costoPromedio = cerrados ? costoRealPeriodo/cerrados : 0;
+  const enMenor = cerradosArr.filter(c=>c.modalidad==="menor").length;
+  const pctMenor = cerrados ? Math.round(enMenor/cerrados*100) : 0;
+
+  document.getElementById('valueGrid').innerHTML = `
+    <div class="valuecard"><div class="vlabel">Ahorro por diagnóstico certero</div><div class="vnum">${money(ahorroDiag)}</div>
+      <div class="vsub">${diagCertero} casos "Cliente" resueltos en Servicio Menor en vez de Mayor, en el periodo seleccionado.</div></div>
+    <div class="valuecard"><div class="vlabel">Casos cerrados en el periodo</div><div class="vnum">${cerrados}</div>
+      <div class="vsub">De ${casos.length} casos detectados en este rango.</div></div>
+    <div class="valuecard"><div class="vlabel">Costo promedio por caso cerrado</div><div class="vnum">${cerrados ? money(costoPromedio) : '—'}</div>
+      <div class="vsub">${cerrados ? `Costo real total (${money(costoRealPeriodo)}) entre ${cerrados} casos cerrados.` : 'Sin casos cerrados en este rango.'}</div></div>
+    <div class="valuecard"><div class="vlabel">Merma en riesgo por sinergia</div><div class="vnum">${money(mermaEnRiesgo)}</div>
+      <div class="vsub">${sinergiaCases.length} casos del backlog actual × kit de refrigerante ($${KIT_REFRI_MIN.toLocaleString('es-MX')}–$${KIT_REFRI_MAX.toLocaleString('es-MX')} c/u).</div></div>
+    <div class="valuecard"><div class="vlabel">Escalamiento de servicio en riesgo</div><div class="vnum">${money(escalamientoRiesgo)}</div>
+      <div class="vsub">${sinergiaCases.filter(s=>s.modalidad==="mayor").length} de ${sinergiaCases.length} casos de sinergia ya marcados como riesgo Mayor.</div></div>
+    <div class="valuecard"><div class="vlabel">Resuelto en Servicio Menor</div><div class="vnum">${cerrados ? pctMenor+'%' : '—'}</div>
+      <div class="vsub">${cerrados ? `${enMenor} de ${cerrados} casos cerrados no necesitaron el servicio mayor ($${PRECIO_MAYOR}).` : 'Sin casos cerrados en este rango.'}</div></div>
+  `;
+}
+
+let selectedDay = null;
+let currentFilteredCases = [];
+const WEEKDAYS = ["dom","lun","mar","mié","jue","vie","sáb"];
+
+function uniqueDatesDesc(casos){
+  const set = new Set(casos.map(c=>c.creado));
+  return Array.from(set).sort((a,b)=> a<b?1:-1);
+}
+
+function renderCalStrip(casos){
+  const dates = uniqueDatesDesc(casos).sort((a,b)=> a<b?-1:1); // ascending para lectura de calendario
+  const strip = document.getElementById('calStrip');
+  const resetChip = `<div class="calchip reset ${selectedDay===null?'active':''}" onclick="onCalSelect(null)">
+      <div class="cw">Todos</div><div class="cd">·</div><div class="cc">${casos.length}</div></div>`;
+
+  let lastMonth = null;
+  const chips = dates.map(d=>{
+    const [y,m,dd] = d.split('-').map(Number);
+    const wd = WEEKDAYS[new Date(d+"T00:00:00").getDay()];
+    const count = casos.filter(c=>c.creado===d).length;
+    const active = selectedDay===d;
+    let divider = '';
+    if(m !== lastMonth){
+      divider = `<div class="cal-month-div"><span>${MESES[m-1]}</span></div>`;
+      lastMonth = m;
+    }
+    return divider + `<div class="calchip ${active?'active':''}" onclick="onCalSelect('${d}')">
+      <div class="cw">${wd}</div><div class="cd">${dd}</div><div class="cc">${count}</div></div>`;
+  }).join('');
+  strip.innerHTML = resetChip + chips;
+}
+
+function onCalSelect(day){
+  selectedDay = day;
+  renderCalStrip(currentFilteredCases);
+  renderDayCards(currentFilteredCases);
+}
+
+function toggleDayCard(el){
+  el.classList.toggle('open');
+}
+
+function renderDayCards(casos){
+  const feed = document.getElementById('feed');
+  const visible = selectedDay ? casos.filter(c=>c.creado===selectedDay) : casos;
+  document.getElementById('feedCount').textContent = `SERVICIOS · ${visible.length} ${visible.length===1?'CASO':'CASOS'}`;
+
+  if(visible.length === 0){
+    feed.innerHTML = `<div class="empty-state">Sin casos nuevos en este rango — la flota se mantiene estable.</div>`;
+    return;
+  }
+  const byDate = {};
+  visible.forEach(c => { (byDate[c.creado] = byDate[c.creado]||[]).push(c); });
+  const dates = Object.keys(byDate).sort((a,b)=> a<b?1:-1);
+
+  feed.innerHTML = dates.map((d,i) => {
+    const items = byDate[d];
+    const isToday = d === HOY;
+    const cards = items.map(c => caseCard(c, isToday)).join('');
+    const openAttr = dates.length===1 ? ' open' : '';
+
+    const cerrados = items.filter(c=>c.cierre).length;
+    const enProceso = items.length - cerrados;
+    let statusLine;
+    if(cerrados && enProceso) statusLine = `✅ ${cerrados} cerrado${cerrados>1?'s':''} &nbsp;·&nbsp; 🟠 ${enProceso} en proceso`;
+    else if(cerrados) statusLine = `✅ ${cerrados} cerrado${cerrados>1?'s':''}`;
+    else statusLine = `🟠 ${enProceso} en proceso`;
+
+    return `
+      <div class="daycard${openAttr}" onclick="toggleDayCard(this)">
+        <div class="daycard-head">
+          <div>
+            <div class="dh-date">${fmt(d)}${isToday?' · hoy':''}</div>
+            <div class="dh-sub">${statusLine}</div>
+          </div>
+          <div class="dh-right">
+            <div class="dh-num">${items.length}</div>
+            <div class="dh-chev">▾</div>
+          </div>
+        </div>
+        <div class="daycard-body" onclick="event.stopPropagation()">
+          <div class="cases">${cards}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderFeed(casos){
+  currentFilteredCases = casos;
+  selectedDay = null;
+  renderCalStrip(casos);
+  renderDayCards(casos);
+}
+
+function ringArc(cx, cy, r, width, pct, color, trackColor){
+  const C = 2*Math.PI*r;
+  const len = Math.max(pct/100*C, pct>0 ? 3 : 0);
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${trackColor}" stroke-width="${width}"/>`
+    + `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${width}"
+        stroke-dasharray="${len} ${C-len}" stroke-linecap="round"
+        transform="rotate(-90 ${cx} ${cy})"/>`;
+}
+
+function renderSpeed(casos){
+  const cerrados = casos.filter(c=>c.cierre);
+  const dias = cerrados.map(c=>diffDays(c.creado, c.cierre));
+  const promedio = dias.length ? (dias.reduce((a,b)=>a+b,0)/dias.length) : 0;
+
+  // Detección → creación de OS: mismo evento en este sistema (automático)
+  const promDeteccionCreacion = 0;
+  // Detección → cierre/atención: como detección≈creación, es el mismo promedio de creación→cierre
+  const promDeteccionCierre = promedio;
+
+  // Acumulado vs. el supuesto de 10 días de tardanza sin telemetría
+  const diasAhorradosPorCaso = dias.map(d => Math.max(TARDANZA_SIN_TELEMETRIA - d, 0));
+  const diasAhorradosAcum = diasAhorradosPorCaso.reduce((a,b)=>a+b, 0);
+  const ventaMin = Math.round(diasAhorradosAcum * (VENTA_MES_MIN/30));
+  const ventaMax = Math.round(diasAhorradosAcum * (VENTA_MES_MAX/30));
+
+  document.getElementById('speedStats').innerHTML = `
+    <div class="speed-stat"><span class="sdot" style="background:#5C6C8C"></span>
+      <div><div class="snum">${promDeteccionCreacion} días</div><div class="slabel">Promedio: detección de falla → creación de OS. Automático, mismo evento en Solkos.</div></div></div>
+    <div class="speed-stat"><span class="sdot" style="background:#E6207A"></span>
+      <div><div class="snum">${promDeteccionCierre.toFixed(1)} días</div><div class="slabel">Promedio: detección de falla → servicio atendido (incluye casos cerrados como improductivos), sobre ${cerrados.length} casos cerrados.</div></div></div>
+  `;
+
+  document.getElementById('speedSavings').innerHTML = `
+    <div class="ssv-item"><div class="ssv-num">${diasAhorradosAcum.toFixed(0)} días</div>
+      <div class="ssv-lbl">Acumulado ahorrado en el periodo (10 − días reales, sumado por cada uno de los ${cerrados.length} casos cerrados).</div></div>
+    <div class="ssv-item"><div class="ssv-num">$${ventaMin.toLocaleString('es-MX')}–$${ventaMax.toLocaleString('es-MX')}</div>
+      <div class="ssv-lbl">Venta protegida acumulada, usando esos días ahorrados × $${ventaDiaMin}–$${ventaDiaMax}/día por punto de venta.</div></div>
+  `;
+
+  renderSpeedLineChart(cerrados, promDeteccionCierre);
+}
+
+function renderSpeedLineChart(cerrados, promedio){
+  const svgEl = document.getElementById('speedLineChart');
+  const width = Math.max(Math.round(svgEl.getBoundingClientRect().width) || 640, 320);
+  const height = 220;
+  svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+  if(cerrados.length === 0){
+    svgEl.innerHTML = `<text x="${width/2}" y="${height/2}" text-anchor="middle" font-family="Inter" font-size="12" fill="#5C6C8C">Sin casos cerrados en este rango</text>`;
+    return;
+  }
+
+  const pts = cerrados
+    .map(c => ({date: c.creado, dias: diffDays(c.creado, c.cierre)}))
+    .sort((a,b)=> a.date < b.date ? -1 : 1);
+
+  const marginL = 34, marginR = 20, marginT = 34, marginB = 34;
+  const plotW = width - marginL - marginR, plotH = height - marginT - marginB;
+  const rangeStartD = pts[0].date, rangeEndD = pts[pts.length-1].date;
+  const totalDays = Math.max(diffDays(rangeStartD, rangeEndD), 1);
+  const maxY = Math.max(...pts.map(p=>p.dias), Math.ceil(promedio), 2);
+
+  const xPos = (d) => marginL + (pts.length===1 ? plotW/2 : (diffDays(rangeStartD, d)/totalDays) * plotW);
+  const yPos = (v) => marginT + plotH - (v/maxY)*plotH;
+
+  // número grande translúcido de fondo (estilo referencia)
+  let svg = `<text x="${width-marginR}" y="${height-28}" text-anchor="end" font-family="Space Grotesk" font-weight="800"
+      font-size="92" fill="rgba(230,32,122,0.10)">${promedio.toFixed(1)}</text>`;
+
+  // líneas guía horizontales por día entero
+  for(let d=0; d<=maxY; d++){
+    const gy = yPos(d);
+    svg += `<line x1="${marginL}" y1="${gy}" x2="${width-marginR}" y2="${gy}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <text x="${marginL-8}" y="${gy+3}" text-anchor="end" font-family="JetBrains Mono" font-size="8.5" fill="#5C6C8C">${d}</text>`;
+  }
+
+  // línea de promedio
+  const avgY = yPos(promedio);
+  svg += `<line x1="${marginL}" y1="${avgY}" x2="${width-marginR}" y2="${avgY}" stroke="#F5A623" stroke-width="1.5" stroke-dasharray="4,4"/>
+    <rect x="${width-marginR-96}" y="${avgY-19}" width="96" height="16" rx="8" fill="#F5A623"/>
+    <text x="${width-marginR-48}" y="${avgY-7.5}" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#13181B">PROM ${promedio.toFixed(1)} d</text>`;
+
+  // línea de datos (con brillo) + puntos
+  const linePts = pts.map(p => `${xPos(p.date)},${yPos(p.dias)}`).join(' ');
+  svg += `<polyline points="${linePts}" fill="none" stroke="#4FD8EC" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.35" filter="blur(4px)"/>`;
+  svg += `<polyline points="${linePts}" fill="none" stroke="url(#speedLineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  pts.forEach(p=>{
+    const px = xPos(p.date), py = yPos(p.dias);
+    svg += `<line x1="${px}" y1="${py}" x2="${px}" y2="${marginT+plotH}" stroke="rgba(79,216,236,0.15)" stroke-width="1"/>
+      <circle cx="${px}" cy="${py}" r="5" fill="#0B1830" stroke="#4FD8EC" stroke-width="2.5"/>
+      <text x="${px}" y="${py-12}" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="white">${p.dias}d</text>
+      <text x="${px}" y="${marginT+plotH+16}" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#5C6C8C">${lblShort(p.date)}</text>`;
+  });
+
+  const defs = `<defs><linearGradient id="speedLineGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#4FD8EC"/><stop offset="100%" stop-color="#E6207A"/>
+  </linearGradient></defs>`;
+
+  svgEl.innerHTML = defs + svg;
+}
+
+function lblShort(iso){ const [y,m,d]=iso.split('-'); return `${parseInt(d)} ${MESES[parseInt(m)-1]}`; }
+
+function applyFilter(range){
+  const start = rangeStart(range);
+  const filtered = allCases.filter(c => c.creado >= start && c.creado <= HOY).sort((a,b)=> a.creado < b.creado ? 1 : -1);
+  renderKpiStrip(filtered);
+  renderSpeed(filtered);
+  renderDonut(filtered);
+  renderTimeline(filtered);
+  renderValueGrid(filtered);
+  renderFeed(filtered);
+}
+
+document.querySelectorAll('#filterbar button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#filterbar button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilter(btn.dataset.range);
+  });
+});
+
+applyFilter('mes');
+</script>
+</body>
+</html>
