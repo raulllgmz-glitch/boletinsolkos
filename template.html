@@ -430,7 +430,6 @@ function shareText(s){
   const diasTxt = s.diasSinAtender != null ? `${s.diasSinAtender} días` : 'sin fecha registrada';
   return `🔧 *Solkos · Caso pendiente de atención*\n\n`
     + `🏪 Establecimiento: ${s.establecimiento}\n`
-    + `🔢 NUD: ${s.nud || 'N/D'}\n`
     + `⚙️ Serie: ${s.serie}\n`
     + `⚠️ Falla detectada: ${s.falla}\n`
     + `⏱️ ${diasTxt} sin atender desde su detección\n`
@@ -489,7 +488,7 @@ document.getElementById('sinergiaFeed').innerHTML = sinergiaCases.map((s,idx) =>
     <div class="case-top">
       <div>
         <div class="sinergia-estab">${s.establecimiento || 'Establecimiento sin nombre registrado'}</div>
-        <div class="case-id">Serie <b>${s.serie}</b> · NUD <b>${s.nud || 'N/D'}</b></div>
+        <div class="case-id">Serie <b>${s.serie}</b></div>
       </div>
       <div class="badgerow">
         <span class="badge costo">Riesgo: Servicio ${s.modalidad==="mayor"?"Mayor":"Menor"}</span>
@@ -541,7 +540,7 @@ function caseCard(c, isNew){
       <div class="case-top">
         <div>
           ${c.establecimiento ? `<div class="sinergia-estab">${c.establecimiento}</div>` : ''}
-          <div class="case-id">${c.os ? `OS <b>${c.os}</b> · Serie ${c.serie}` : `Serie <b>${c.serie}</b> · sin OS aún`}${c.nud ? ` · NUD <b>${c.nud}</b>` : ''}</div>
+          <div class="case-id">${c.os ? `OS <b>${c.os}</b> · Serie ${c.serie}` : `Serie <b>${c.serie}</b> · sin OS aún`}</div>
         </div>
         <div class="badgerow">
           ${isNew ? '<span class="badge nuevo"><span class="dot"></span>Nuevo</span>' : (c.updatedToday ? '<span class="badge nuevo"><span class="dot"></span>Actualizado hoy</span>' : '')}
