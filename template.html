@@ -48,6 +48,16 @@
   .sub{margin-top:12px;font-size:15px;color:var(--ink-soft);max-width:600px;line-height:1.55;}
   .rule{height:3px;width:56px;background:var(--coral);margin:22px 0 26px 0;border-radius:3px;}
 
+  /* ---------- NAV TABS (entre herramientas) ---------- */
+  .navtabs{display:flex;gap:6px;margin-bottom:22px;}
+  .navtabs a{
+    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;
+    padding:8px 16px;border-radius:100px;text-decoration:none;
+    color:var(--ink-soft);background:var(--card);border:1px solid var(--line);
+  }
+  .navtabs a.active{background:var(--coral);color:white;border-color:var(--coral);}
+  .navtabs a:not(.active):hover{color:var(--text-strong);border-color:var(--coral);}
+
   /* ---------- FILTER ---------- */
   .filterbar{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:100px;padding:5px;width:fit-content;box-shadow:0 1px 0 rgba(0,0,0,0.02);}
   .filterbar button{appearance:none;border:none;background:transparent;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 18px;border-radius:100px;cursor:pointer;transition:all .18s ease;}
@@ -294,6 +304,11 @@
         </div>
       </div>
       <div class="tag-mono" style="text-align:right;">Boletín de Servicios<br>Cliente: Alpura</div>
+    </div>
+
+    <div class="navtabs">
+      <a href="/" class="active">Servicios</a>
+      <a href="/voltaje">Problemas de Voltaje</a>
     </div>
 
     <div class="eyebrow">Boletín predictivo recurrente</div>

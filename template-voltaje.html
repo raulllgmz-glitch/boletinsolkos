@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problemas de Voltaje — Solkos Alpura</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --cream:#0A1830;
+    --card:#132B4F;
+    --polar:#1D3A63;
+    --line:rgba(255,255,255,0.08);
+    --navy:#4FD8EC;
+    --near-black:#13181B;
+    --text-strong:#F4F7FC;
+    --amber:#F5A623;
+    --coral:#E6207A;
+    --ink:#F4F7FC;
+    --ink-soft:#8FA0C0;
+    --ink-dim:#5C6C8C;
+    --success:#33D68A;
+    --danger:#FF6B6B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:70px;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 28px;}
+
+  header{padding:40px 0 0 0;}
+  .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;}
+  .lockup{display:flex;align-items:center;gap:10px;}
+  .mark{width:26px;height:26px;border-radius:7px;flex:none;background:linear-gradient(135deg,var(--coral),#8B2E63);position:relative;}
+  .mark::after{content:"";position:absolute;inset:5px;background:rgba(255,255,255,0.9);border-radius:3px;}
+  .wordmark{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.3px;color:var(--navy);}
+  .wordmark span{color:var(--coral);}
+  .tag-mono{font-size:10.5px;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;}
+
+  .navtabs{display:flex;gap:6px;margin-bottom:22px;}
+  .navtabs a{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:100px;text-decoration:none;color:var(--ink-soft);background:var(--card);border:1px solid var(--line);}
+  .navtabs a.active{background:var(--coral);color:white;border-color:var(--coral);}
+  .navtabs a:not(.active):hover{color:var(--text-strong);border-color:var(--coral);}
+
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:10px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:34px;line-height:1.14;letter-spacing:-0.5px;max-width:820px;color:var(--text-strong);}
+  .sub{margin-top:12px;font-size:15px;color:var(--ink-soft);max-width:600px;line-height:1.55;}
+  .rule{height:3px;width:56px;background:var(--coral);margin:22px 0 26px 0;border-radius:3px;}
+
+  .sectionhead{margin:44px 0 18px 0;}
+  .sectionhead .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);letter-spacing:1px;}
+  .sectionhead h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;margin-top:4px;color:var(--text-strong);}
+  .sectionhead p{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:560px;line-height:1.5;}
+
+  .kpistrip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  .kpi{background:var(--card);padding:22px 18px;}
+  .kpi .num{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:34px;letter-spacing:-1px;}
+  .kpi .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
+  .kpi.c-navy .num{color:var(--navy);}
+  .kpi.c-danger .num{color:var(--danger);}
+  .kpi.c-amber .num{color:var(--amber);}
+  .kpi.c-success .num{color:var(--success);}
+
+  .chartcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:16px;}
+  .chartcard .ctitle{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;color:var(--text-strong);}
+  #map{height:360px;border-radius:12px;overflow:hidden;background:var(--polar);}
+  .map-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;}
+  .map-legend .li{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);}
+  .map-legend .sw{width:10px;height:10px;border-radius:50%;flex:none;}
+
+  .filterbar{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:100px;padding:5px;width:fit-content;margin-top:20px;}
+  .filterbar button{appearance:none;border:none;background:transparent;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 18px;border-radius:100px;cursor:pointer;transition:all .18s ease;}
+  .filterbar button.active{background:var(--coral);color:white;}
+  .filterbar button:not(.active):hover{color:var(--text-strong);}
+
+  .cases{display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+  .case{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,30,0.03);}
+  .case::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .case.pri-alta::before{background:var(--danger);}
+  .case.pri-media::before{background:var(--amber);}
+  .case.pri-baja::before{background:var(--success);}
+  .case.pri-sd::before{background:var(--polar);}
+
+  .case-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+  .estab-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text-strong);margin-bottom:3px;}
+  .case-id{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);}
+  .case-id b{color:var(--text-strong);font-size:13px;}
+  .badgerow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.4px;text-transform:uppercase;padding:4px 9px;border-radius:100px;font-weight:700;white-space:nowrap;}
+  .badge.pri-alta{background:rgba(255,107,107,0.16);color:var(--danger);}
+  .badge.pri-media{background:rgba(245,166,35,0.16);color:var(--amber);}
+  .badge.pri-baja{background:rgba(51,214,138,0.14);color:var(--success);}
+  .badge.pri-sd{background:rgba(143,160,192,0.16);color:var(--ink-soft);}
+
+  .falla{margin-top:8px;font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .dias-sin-atender{margin-top:10px;padding:9px 14px;background:rgba(255,107,107,0.10);border:1px solid rgba(255,107,107,0.25);border-radius:10px;font-size:13px;font-weight:600;color:var(--danger);display:inline-block;}
+  .dias-sin-atender.urgente{background:rgba(255,107,107,0.18);border-color:rgba(255,107,107,0.45);}
+  .falla b{color:var(--text-strong);font-weight:600;}
+
+  .contactbox{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:12px;display:flex;flex-direction:column;gap:6px;}
+  .cb-row{display:flex;gap:10px;font-size:12px;}
+  .cb-lbl{width:74px;flex:none;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;padding-top:1px;}
+  .cb-val{color:var(--text-strong);font-weight:600;}
+  .cb-val i{color:var(--ink-dim);font-style:normal;font-weight:500;}
+
+  .sharebtns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .sharebtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px 16px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:none;cursor:pointer;}
+  .sharebtn.native{background:var(--coral);color:white;}
+  .sharebtn.wa{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);}
+  .sharebtn.maps{background:var(--card);color:var(--navy);border:1px solid rgba(79,216,236,0.3);}
+  .sharebtn.disabled{background:transparent;color:var(--ink-dim);border:1px dashed var(--line);cursor:default;}
+
+  .sharefallback{display:none;margin-top:10px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:10px;}
+  .sharefallback .sf-lbl{font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
+  .sharefallback .sf-ok{font-size:12px;color:var(--success);font-weight:600;}
+  .sharefallback textarea{width:100%;min-height:70px;background:rgba(0,0,0,0.2);border:1px solid var(--line);border-radius:8px;color:var(--text-strong);font-family:'Inter',sans-serif;font-size:12px;padding:8px;resize:vertical;}
+
+  .empty-state{border:1px dashed var(--line);border-radius:14px;padding:16px 20px;color:var(--ink-dim);font-size:12.5px;background:rgba(255,255,255,0.02);}
+
+  footer{max-width:960px;margin:50px auto 0 auto;padding:22px 28px 0 28px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-dim);text-align:center;}
+
+  @media (max-width:640px){
+    .kpistrip{grid-template-columns:repeat(2,1fr);}
+    h1{font-size:26px;}
+    .wrap{padding:0 18px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brandrow">
+      <div class="lockup">
+        <div class="mark"></div>
+        <div>
+          <div class="wordmark">sol<span>kos</span></div>
+          <div class="tag-mono">Powered by Imbera</div>
+        </div>
+      </div>
+      <div class="tag-mono" style="text-align:right;">Consola de Riesgo<br>Cliente: Alpura</div>
+    </div>
+
+    <div class="navtabs">
+      <a href="/">Servicios</a>
+      <a href="/voltaje" class="active">Problemas de Voltaje</a>
+    </div>
+
+    <div class="eyebrow">Equipos en observación</div>
+    <h1>Puntos de venta con problemas de voltaje</h1>
+    <p class="sub">Telemetría detectó voltaje inestable en estos equipos — todavía no generan una orden de servicio, pero valen la pena priorizar antes de que escalen.</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="kpistrip" id="kpiStrip"></div>
+  <div class="kpistrip" id="moneyStrip" style="grid-template-columns:repeat(2,1fr);margin-top:14px;"></div>
+
+  <div class="chartcard">
+    <div class="ctitle">Mapa de puntos en riesgo</div>
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="li"><span class="sw" style="background:#FF6B6B"></span>Prioridad alta</div>
+      <div class="li"><span class="sw" style="background:#F5A623"></span>Prioridad media</div>
+      <div class="li"><span class="sw" style="background:#33D68A"></span>Prioridad baja</div>
+    </div>
+  </div>
+
+  <div class="filterbar" id="filterbar">
+    <button data-pri="todos" class="active">Todos</button>
+    <button data-pri="alta">Alta</button>
+    <button data-pri="media">Media</button>
+    <button data-pri="baja">Baja</button>
+  </div>
+
+  <div class="sectionhead">
+    <div class="num" id="listCount">PUNTOS</div>
+    <h2>Detalle por punto de venta</h2>
+    <p>Ordenados por prioridad — los de arriba son los que más urge atender.</p>
+  </div>
+  <div class="cases" id="puntosFeed"></div>
+
+  <footer>
+    Generados desde Consola Solkos Powered by Imbera<br>
+    Módulo de Riesgo — Cliente Alpura · Tabla "Problemas de Voltaje"
+  </footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const HOY = "__HOY__";
+const puntos = __PUNTOS__;
+
+const PRI_COLOR = { alta:'#FF6B6B', media:'#F5A623', baja:'#33D68A', sd:'#8FA0C0' };
+const PRI_LABEL = { alta:'Prioridad Alta', media:'Prioridad Media', baja:'Prioridad Baja', sd:'Sin prioridad' };
+
+const MERMA_MIN = 4500, MERMA_MAX = 5000;
+const PRECIO_MENOR = 920;
+const money = n => '$' + Math.round(n).toLocaleString('es-MX');
+
+// ---- KPI strip (totales generales, no cambia con el filtro) ----
+function renderKpi(){
+  const counts = { alta:0, media:0, baja:0 };
+  puntos.forEach(p => { if(counts[p.prioridad] !== undefined) counts[p.prioridad]++; });
+  document.getElementById('kpiStrip').innerHTML = `
+    <div class="kpi c-navy"><div class="num">${puntos.length}</div><div class="lbl">Puntos en observación</div></div>
+    <div class="kpi c-danger"><div class="num">${counts.alta}</div><div class="lbl">Prioridad alta</div></div>
+    <div class="kpi c-amber"><div class="num">${counts.media}</div><div class="lbl">Prioridad media</div></div>
+    <div class="kpi c-success"><div class="num">${counts.baja}</div><div class="lbl">Prioridad baja</div></div>
+  `;
+}
+
+// ---- Costo acumulado (sí cambia con el filtro de prioridad activo) ----
+function renderMoney(filtered){
+  const n = filtered.length;
+  const mermaMin = n * MERMA_MIN, mermaMax = n * MERMA_MAX;
+  const costoMenor = n * PRECIO_MENOR;
+  document.getElementById('moneyStrip').innerHTML = `
+    <div class="kpi c-danger"><div class="num">${money(mermaMin)}–${money(mermaMax)}</div><div class="lbl">Merma acumulada en riesgo (${n} punto${n===1?'':'s'} × $${MERMA_MIN.toLocaleString('es-MX')}–$${MERMA_MAX.toLocaleString('es-MX')})</div></div>
+    <div class="kpi c-navy"><div class="num">${money(costoMenor)}</div><div class="lbl">Costo acumulado si se atiende ahora (${n} × Servicio Menor, $${PRECIO_MENOR})</div></div>
+  `;
+}
+
+// ---- Mapa ----
+let mapInstance = null;
+let markerLayer = null;
+function renderMap(filtered){
+  const withCoords = filtered.filter(p => p.lat != null && p.long != null);
+  if(typeof L === 'undefined'){
+    document.getElementById('map').innerHTML = '<div style="padding:20px;color:#8FA0C0;font-size:12.5px;">No se pudo cargar el mapa (sin conexión al proveedor de mapas). Usa el link "Ver en mapa" de cada tarjeta.</div>';
+    return;
+  }
+  if(!mapInstance){
+    mapInstance = L.map('map', { scrollWheelZoom:false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 18
+    }).addTo(mapInstance);
+    markerLayer = L.layerGroup().addTo(mapInstance);
+  }
+  markerLayer.clearLayers();
+  if(withCoords.length === 0){
+    mapInstance.setView([19.4, -99.1], 9);
+    return;
+  }
+  const bounds = [];
+  withCoords.forEach(p => {
+    const color = PRI_COLOR[p.prioridad];
+    const marker = L.circleMarker([p.lat, p.long], {
+      radius: 8, color: '#0A1830', weight: 2, fillColor: color, fillOpacity: 0.9
+    }).bindPopup(`<b>${p.establecimiento}</b><br>${PRI_LABEL[p.prioridad]}<br>${p.direccion || ''}`);
+    marker.addTo(markerLayer);
+    bounds.push([p.lat, p.long]);
+  });
+  mapInstance.fitBounds(bounds, { padding:[24,24], maxZoom:12 });
+}
+
+// ---- Compartir (mismo patrón que el boletín principal) ----
+function shareTextVoltaje(p){
+  return `⚡ *Solkos · Equipo con problema de voltaje*\n\n`
+    + `🏪 Establecimiento: ${p.establecimiento}\n`
+    + `⚙️ Serie: ${p.serie}${p.modelo ? ` · Modelo: ${p.modelo}` : ''}\n`
+    + `⚠️ ${p.falla}\n`
+    + `🔴 ${PRI_LABEL[p.prioridad]}\n`
+    + (p.diasDeteccion != null ? `⏱️ ${p.diasDeteccion} días detectado sin atender\n` : '')
+    + (p.direccion ? `📍 ${p.direccion}\n` : '')
+    + `\n¿Podrían ayudarnos a coordinar una visita antes de que escale a una falla mayor? 🙏\n\n`
+    + `— Solkos / Imbera`;
+}
+
+async function nativeShareVoltaje(idx, btn){
+  const p = puntosFiltrados[idx];
+  const text = shareTextVoltaje(p);
+  if(navigator.share){
+    try{ await navigator.share({title:`Solkos · ${p.establecimiento}`, text}); return; }
+    catch(e){ return; }
+  }
+  let copied = false;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    }
+  }catch(e){ copied = false; }
+
+  const card = btn.closest('.case');
+  let box = card.querySelector('.sharefallback');
+  if(!box){
+    box = document.createElement('div');
+    box.className = 'sharefallback';
+    card.querySelector('.sharebtns').insertAdjacentElement('afterend', box);
+  }
+  box.innerHTML = copied
+    ? `<div class="sf-ok">✓ Copiado al portapapeles</div>`
+    : `<div class="sf-lbl">No se pudo copiar automáticamente — selecciona y copia el texto:</div>
+       <textarea readonly onclick="this.select()">${text}</textarea>`;
+  box.style.display = 'block';
+  if(!copied){ const ta = box.querySelector('textarea'); ta.focus(); ta.select(); }
+  else setTimeout(()=>{ box.style.display='none'; }, 2500);
+}
+
+// ---- Lista de tarjetas ----
+let puntosFiltrados = [];
+function puntoCard(p, idx){
+  const waLink = p.tel ? `https://wa.me/52${p.tel}?text=${encodeURIComponent(shareTextVoltaje(p))}` : null;
+  const mapsLink = (p.lat != null && p.long != null) ? `https://www.google.com/maps?q=${p.lat},${p.long}` : null;
+  return `
+    <div class="case pri-${p.prioridad}">
+      <div class="case-top">
+        <div>
+          <div class="estab-name">${p.establecimiento}</div>
+          <div class="case-id">Serie <b>${p.serie || 'N/D'}</b>${p.modelo ? ` · ${p.modelo}` : ''}</div>
+        </div>
+        <span class="badge pri-${p.prioridad}">${PRI_LABEL[p.prioridad]}</span>
+      </div>
+      ${p.diasDeteccion != null ? `<div class="dias-sin-atender ${p.diasDeteccion>=30?'urgente':''}">⏱️ ${p.diasDeteccion} días detectado sin atender</div>` : ''}
+      <div class="falla">⚠️ <b>${p.falla}</b></div>
+
+      <div class="contactbox">
+        <div class="cb-row"><span class="cb-lbl">Contacto</span><span class="cb-val">${p.contacto ? p.contacto : '<i>No registrado</i>'}</span></div>
+        <div class="cb-row"><span class="cb-lbl">Teléfono</span><span class="cb-val">${p.tel ? p.tel : '<i>No registrado</i>'}</span></div>
+        <div class="cb-row"><span class="cb-lbl">Dirección</span><span class="cb-val">${p.direccion || '<i>No registrada</i>'}</span></div>
+      </div>
+
+      <div class="sharebtns">
+        <button class="sharebtn native" onclick="nativeShareVoltaje(${idx}, this)">⤴ Compartir</button>
+        ${waLink ? `<a class="sharebtn wa" href="${waLink}" target="_blank">↗ WhatsApp directo</a>` : `<span class="sharebtn disabled">Sin teléfono</span>`}
+        ${mapsLink ? `<a class="sharebtn maps" href="${mapsLink}" target="_blank">📍 Ver en mapa</a>` : `<span class="sharebtn disabled">Sin coordenadas</span>`}
+      </div>
+    </div>
+  `;
+}
+
+function applyPriFilter(pri){
+  puntosFiltrados = pri === 'todos' ? puntos : puntos.filter(p => p.prioridad === pri);
+  document.getElementById('listCount').textContent = `PUNTOS · ${puntosFiltrados.length}`;
+  const feed = document.getElementById('puntosFeed');
+  feed.innerHTML = puntosFiltrados.length
+    ? puntosFiltrados.map((p,i) => puntoCard(p,i)).join('')
+    : `<div class="empty-state">Sin puntos en esta prioridad.</div>`;
+  renderMoney(puntosFiltrados);
+  renderMap(puntosFiltrados);
+}
+
+document.querySelectorAll('#filterbar button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#filterbar button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    applyPriFilter(btn.dataset.pri);
+  });
+});
+
+renderKpi();
+applyPriFilter('todos');
+</script>
+</body>
+</html>

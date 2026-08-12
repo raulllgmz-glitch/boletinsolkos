@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/api/boletin" }
+    { "source": "/", "destination": "/api/boletin" },
+    { "source": "/voltaje", "destination": "/api/voltaje" }
   ]
 }
