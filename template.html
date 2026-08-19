@@ -84,9 +84,6 @@
   .alertbanner.recurrente .anum{color:var(--amber);}
   .alertbanner.recurrente .atitle{color:var(--amber);}
   .alertbanner.recurrente .achip{background:var(--amber);color:var(--near-black);}
-  .alertbanner.improductivo .anum{color:var(--danger);}
-  .alertbanner.improductivo .atitle{color:var(--danger);}
-  .alertbanner.improductivo .achip{background:var(--danger);color:var(--near-black);}
 
   /* ---------- CHART ROW (grandes) ---------- */
   .speedcard{background:#081321;border-radius:22px;padding:32px 34px;margin-top:16px;}
@@ -335,18 +332,9 @@
   <div class="alertbanner recurrente" id="recurrenteBanner" style="display:none;">
     <div class="anum" id="recurrenteNum">0</div>
     <div class="abody">
-      <div class="atitle">Equipos con fallas recurrentes</div>
+      <div class="atitle">Casos cerrados como improductivos</div>
       <div class="adesc">Estos equipos ya generaron más de un caso de servicio — puede valer la pena evaluar reemplazo en vez de seguir reparando.</div>
       <div class="achips" id="recurrenteChips"></div>
-    </div>
-  </div>
-
-  <div class="alertbanner improductivo" id="improductivoBanner" style="display:none;">
-    <div class="anum" id="improductivoNum">0</div>
-    <div class="abody">
-      <div class="atitle">Casos cerrados como improductivos</div>
-      <div class="adesc">El técnico se presentó pero no se otorgó acceso — de estos, las series marcadas se han repetido más de una vez.</div>
-      <div class="achips" id="improductivoChips"></div>
     </div>
   </div>
 
@@ -441,7 +429,21 @@ function buildTrace(c){
 // ---- Equipos recurrentes: cuenta cuántos casos tiene cada serie en TODO el histórico (no solo el filtro) ----
 const serieCounts = {};
 rawCases.forEach(c => { serieCounts[c.serie] = (serieCounts[c.serie]||0) + 1; });
-const recurrentSeries = Object.keys(serieCounts).filter(s => serieCounts[s] > 1);
+
+// Para cada serie, encontramos su caso más reciente (por fecha de creación)
+const latestCaseBySerie = {};
+rawCases.forEach(c => {
+  const existing = latestCaseBySerie[c.serie];
+  if(!existing || c.creado > existing.creado) latestCaseBySerie[c.serie] = c;
+});
+
+// Se excluye una serie de la lista si su caso MÁS RECIENTE ya cerró bien (Cliente o Garantía)
+const recurrentSeries = Object.keys(serieCounts).filter(s => {
+  if(serieCounts[s] <= 1) return false;
+  const latest = latestCaseBySerie[s];
+  const resueltoExitoso = latest && latest.cierre && (latest.dictamen === 'cliente' || latest.dictamen === 'garantia');
+  return !resueltoExitoso;
+});
 
 const recBanner = document.getElementById('recurrenteBanner');
 if(recurrentSeries.length > 0){
@@ -450,23 +452,6 @@ if(recurrentSeries.length > 0){
   document.getElementById('recurrenteChips').innerHTML = recurrentSeries
     .sort((a,b)=> serieCounts[b]-serieCounts[a])
     .map(s => `<span class="achip">${s} · ${serieCounts[s]}x</span>`).join('');
-}
-
-// ---- Casos improductivos: total + cuáles series se repiten dentro de ese grupo ----
-const improductivoCases = rawCases.filter(c => c.dictamen === 'improductivo');
-const impSerieCounts = {};
-improductivoCases.forEach(c => { impSerieCounts[c.serie] = (impSerieCounts[c.serie]||0) + 1; });
-const impRecurrentSeries = Object.keys(impSerieCounts).filter(s => impSerieCounts[s] > 1);
-
-const impBanner = document.getElementById('improductivoBanner');
-if(improductivoCases.length > 0){
-  impBanner.style.display = '';
-  document.getElementById('improductivoNum').textContent = improductivoCases.length;
-  document.getElementById('improductivoChips').innerHTML = impRecurrentSeries.length
-    ? impRecurrentSeries
-        .sort((a,b)=> impSerieCounts[b]-impSerieCounts[a])
-        .map(s => `<span class="achip">🔁 ${s} · ${impSerieCounts[s]}x</span>`).join('')
-    : '';
 }
 
 const allCases = rawCases.map(c => ({
