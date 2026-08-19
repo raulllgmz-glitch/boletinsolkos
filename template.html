@@ -48,16 +48,6 @@
   .sub{margin-top:12px;font-size:15px;color:var(--ink-soft);max-width:600px;line-height:1.55;}
   .rule{height:3px;width:56px;background:var(--coral);margin:22px 0 26px 0;border-radius:3px;}
 
-  /* ---------- NAV TABS (entre herramientas) ---------- */
-  .navtabs{display:flex;gap:6px;margin-bottom:22px;}
-  .navtabs a{
-    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;
-    padding:8px 16px;border-radius:100px;text-decoration:none;
-    color:var(--ink-soft);background:var(--card);border:1px solid var(--line);
-  }
-  .navtabs a.active{background:var(--coral);color:white;border-color:var(--coral);}
-  .navtabs a:not(.active):hover{color:var(--text-strong);border-color:var(--coral);}
-
   /* ---------- FILTER ---------- */
   .filterbar{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:100px;padding:5px;width:fit-content;box-shadow:0 1px 0 rgba(0,0,0,0.02);}
   .filterbar button{appearance:none;border:none;background:transparent;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 18px;border-radius:100px;cursor:pointer;transition:all .18s ease;}
@@ -71,7 +61,7 @@
   .sectionhead p{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:560px;line-height:1.5;}
 
   /* ---------- KPI STRIP ---------- */
-  .kpistrip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  .kpistrip{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
   .kpi{background:var(--card);padding:22px 18px;}
   .kpi .num{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:34px;letter-spacing:-1px;}
   .kpi .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
@@ -91,6 +81,12 @@
   .alertbanner .adesc{font-size:12.5px;color:#9BA6AE;margin-top:5px;line-height:1.5;max-width:480px;}
   .alertbanner .achips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
   .alertbanner .achip{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:white;background:var(--coral);padding:5px 11px;border-radius:100px;font-weight:700;}
+  .alertbanner.recurrente .anum{color:var(--amber);}
+  .alertbanner.recurrente .atitle{color:var(--amber);}
+  .alertbanner.recurrente .achip{background:var(--amber);color:var(--near-black);}
+  .alertbanner.improductivo .anum{color:var(--danger);}
+  .alertbanner.improductivo .atitle{color:var(--danger);}
+  .alertbanner.improductivo .achip{background:var(--danger);color:var(--near-black);}
 
   /* ---------- CHART ROW (grandes) ---------- */
   .speedcard{background:#081321;border-radius:22px;padding:32px 34px;margin-top:16px;}
@@ -208,6 +204,7 @@
   .badge.nuevo{background:var(--coral);color:white;display:flex;align-items:center;gap:4px;}
   .badge.nuevo .dot{width:5px;height:5px;border-radius:50%;background:white;animation:pulse 1.6s infinite;}
   .badge.costo{background:rgba(255,255,255,0.1);color:var(--text-strong);font-family:'JetBrains Mono',monospace;}
+  .badge.recurrente{background:rgba(245,166,35,0.16);color:var(--amber);}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
 
   .status-line{margin-top:9px;font-size:13.5px;font-weight:600;}
@@ -306,11 +303,6 @@
       <div class="tag-mono" style="text-align:right;">Boletín de Servicios<br>Cliente: Alpura</div>
     </div>
 
-    <div class="navtabs">
-      <a href="/" class="active">Servicios</a>
-      <a href="/voltaje">Problemas de Voltaje</a>
-    </div>
-
     <div class="eyebrow">Boletín predictivo recurrente</div>
     <h1>Servicios por Telemetría Solkos</h1>
     <p class="sub">Datos en vivo desde Solkos, a partir de julio 2026. El filtro corre sobre la fecha de creación de cada caso — cambia el rango y todo se recalcula.</p>
@@ -337,6 +329,24 @@
       <div class="atitle">Requieren tu ayuda para desbloquearse</div>
       <div class="adesc">Telemetría ya detectó el patrón — estos casos no avanzan hasta que Alpura ayude a confirmar contacto o dar acceso al punto de venta.</div>
       <div class="achips" id="sinergiaChips"></div>
+    </div>
+  </div>
+
+  <div class="alertbanner recurrente" id="recurrenteBanner" style="display:none;">
+    <div class="anum" id="recurrenteNum">0</div>
+    <div class="abody">
+      <div class="atitle">Equipos con fallas recurrentes</div>
+      <div class="adesc">Estos equipos ya generaron más de un caso de servicio — puede valer la pena evaluar reemplazo en vez de seguir reparando.</div>
+      <div class="achips" id="recurrenteChips"></div>
+    </div>
+  </div>
+
+  <div class="alertbanner improductivo" id="improductivoBanner" style="display:none;">
+    <div class="anum" id="improductivoNum">0</div>
+    <div class="abody">
+      <div class="atitle">Casos cerrados como improductivos</div>
+      <div class="adesc">El técnico se presentó pero no se otorgó acceso — de estos, las series marcadas se han repetido más de una vez.</div>
+      <div class="achips" id="improductivoChips"></div>
     </div>
   </div>
 
@@ -428,8 +438,40 @@ function buildTrace(c){
   return trace;
 }
 
+// ---- Equipos recurrentes: cuenta cuántos casos tiene cada serie en TODO el histórico (no solo el filtro) ----
+const serieCounts = {};
+rawCases.forEach(c => { serieCounts[c.serie] = (serieCounts[c.serie]||0) + 1; });
+const recurrentSeries = Object.keys(serieCounts).filter(s => serieCounts[s] > 1);
+
+const recBanner = document.getElementById('recurrenteBanner');
+if(recurrentSeries.length > 0){
+  recBanner.style.display = '';
+  document.getElementById('recurrenteNum').textContent = recurrentSeries.length;
+  document.getElementById('recurrenteChips').innerHTML = recurrentSeries
+    .sort((a,b)=> serieCounts[b]-serieCounts[a])
+    .map(s => `<span class="achip">${s} · ${serieCounts[s]}x</span>`).join('');
+}
+
+// ---- Casos improductivos: total + cuáles series se repiten dentro de ese grupo ----
+const improductivoCases = rawCases.filter(c => c.dictamen === 'improductivo');
+const impSerieCounts = {};
+improductivoCases.forEach(c => { impSerieCounts[c.serie] = (impSerieCounts[c.serie]||0) + 1; });
+const impRecurrentSeries = Object.keys(impSerieCounts).filter(s => impSerieCounts[s] > 1);
+
+const impBanner = document.getElementById('improductivoBanner');
+if(improductivoCases.length > 0){
+  impBanner.style.display = '';
+  document.getElementById('improductivoNum').textContent = improductivoCases.length;
+  document.getElementById('improductivoChips').innerHTML = impRecurrentSeries.length
+    ? impRecurrentSeries
+        .sort((a,b)=> impSerieCounts[b]-impSerieCounts[a])
+        .map(s => `<span class="achip">🔁 ${s} · ${impSerieCounts[s]}x</span>`).join('')
+    : '';
+}
+
 const allCases = rawCases.map(c => ({
   ...c,
+  serieCount: serieCounts[c.serie],
   statusText: !c.cierre ? "En proceso" : (c.dictamen==="improductivo" ? "Cerrado como improductivo" : (c.dictamen==="noefectivo" ? "Cerrado — no efectivo" : "Completado")),
   statusClass: (!c.cierre || c.dictamen==="improductivo" || c.dictamen==="noefectivo") ? "open" : "done",
   trace: buildTrace(c)
@@ -560,6 +602,7 @@ function caseCard(c, isNew){
         </div>
         <div class="badgerow">
           ${isNew ? '<span class="badge nuevo"><span class="dot"></span>Nuevo</span>' : (c.updatedToday ? '<span class="badge nuevo"><span class="dot"></span>Actualizado hoy</span>' : '')}
+          ${c.serieCount > 1 ? `<span class="badge recurrente">🔁 ${c.serieCount} casos de este equipo</span>` : ''}
           ${c.costo != null ? `<span class="badge costo">${money(c.costo)}</span>` : ''}
           <span class="badge ${c.dictamen}">Dictamen: ${c.label}</span>
         </div>
@@ -579,8 +622,10 @@ function renderKpiStrip(casos){
   const efectivas = casos.filter(c=>c.dictamen==="cliente"||c.dictamen==="garantia").length;
   const costoReal = casos.reduce((s,c)=>s+(c.costo||0),0);
   const pct = casos.length ? Math.round(efectivas/casos.length*100) : 0;
+  const equiposUnicos = new Set(casos.map(c=>c.serie)).size;
   document.getElementById('kpiStrip').innerHTML = `
     <div class="kpi c-navy"><div class="num">${casos.length}</div><div class="lbl">Casos detectados por telemetría</div></div>
+    <div class="kpi c-navy"><div class="num">${equiposUnicos}</div><div class="lbl">Equipos únicos (de ${casos.length} registros)</div></div>
     <div class="kpi c-black"><div class="num">${pct}%</div><div class="lbl">Efectivos — falla confirmada y resuelta</div></div>
     <div class="kpi c-amber"><div class="num">${money(costoReal)}</div><div class="lbl">Costo real de servicios del periodo</div></div>
     <div class="kpi c-coral"><div class="num">${sinergiaCases.length}</div><div class="lbl">Casos requieren sinergia con Alpura</div></div>
